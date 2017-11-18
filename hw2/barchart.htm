@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<head>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+  <style type="text/css">
+    rect {
+        fill:teal;
+        fill-opacity:.8;
+    }
+    rect.background {
+        fill: white;
+    }
+
+    .axis {
+        shape-rendering: crispEdges;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+    }
+    svg{
+        margin: 0 auto;
+    }
+    rect{
+        margin-left: 50px
+    }
+    input{
+        margin-right: 15px;
+      }
+  </style>
+</head>
+<body>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <p>Time update: 1995 
+      <input type="range" name="points" min="1995" max="2012" step="1" value="0" id="sliderdate" oninput="change_year_diagram(this.value)"> 2012
+    </p>
+    <p>
+      Encode by:
+      <label>Population<input type="radio" name="encode" id = "population" value="population" onclick="change_encode('population')"></label>
+      <label>GDP<input type="radio" name="encode" id = "gdp" value="gdp" onclick="change_encode('gdp')"></label>
+    </p>
+    <p>
+      Ftlter by: <label>Americas<input type="checkbox" name="Americas" value="Americas" title="Americas" id = "Americas"></input></label>
+      <label>Africa<input type="checkbox" name="Africa" value="Africa" title="Africa" id = "Africa"></input></label>
+      <label>Asia<input type="checkbox" name="Asia" value="Asia" title="Asia" id ="Asia"></input></label>
+      <label>Europe<input type="checkbox" name="Europe" value="Europe" title="Europe" id = "Europe"></input></label>
+      <label>Oceania<input type="checkbox" name="Oceania" value="Oceania" title="Oceania" id = "Oceania""></input></label>
+    </p>
+    <p>
+      Aggregate by:
+      <label>Continent<input type="radio" name="agrigate" id = "continent" value="Continent" onclick="change_radio('continent')"></label>
+      <label>Country<input type="radio" name="agrigate" id = "agr_country" value="None" onclick="change_radio('none')"></label>
+    </p>
+    <p>
+      Sort by:
+      <label>Name<input type="radio" name="sort" id = "sort_name" value="Name" onclick="change_sort('sort_name')"></label>
+      <label>Population<input type="radio" name="sort" id = "sort_pop" value="Population" onclick="change_sort('sort_pop')""></label>
+      <label>GDP<input type="radio" name="sort" id = "sort_gdp" value="GDP" onclick="change_sort('sort_gdp')""></label>
+    </p>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript">
+
+     function change_year_diagram(year){
+            document.cookie = "year_diagram="+year;
+            d3.select("svg").remove();
+            diagram();
+     } 
+
+     function change_encode(encode){
+        document.cookie = "encode="+encode;
+        d3.select("svg").remove();
+        diagram();
+     }
+
+    document.getElementById('Americas').onclick = function() { //Americans input
+        if (this.checked) {
+            document.cookie = "Americas=on";
+            d3.select("svg").remove();
+            diagram();
+        } else {
+            deleteCookie("Americas");
+            d3.select("svg").remove();
+            diagram();
+        }
+        };
+
+    document.getElementById('Africa').onclick = function() { //Africa
+        if (this.checked) {
+            document.cookie = "Africa=on";
+            d3.select("svg").remove();
+            diagram();
+        } else {
+            deleteCookie("Africa");
+            d3.select("svg").remove();
+            diagram();
+        }
+        };
+
+    document.getElementById('Asia').onclick = function() { //Asia
+        if (this.checked) {
+            document.cookie = "Asia=on";
+            d3.select("svg").remove();
+            diagram();
+        } else {
+            deleteCookie("Asia");
+            d3.select("svg").remove();
+            diagram();
+        }
+        };
+
+    document.getElementById('Europe').onclick = function() { //Europe
+        if (this.checked) {
+            document.cookie = "Europe=on";
+            d3.select("svg").remove();
+            diagram();
+        } else {
+            deleteCookie("Europe");
+            d3.select("svg").remove();
+            diagram();
+        }
+        };
+
+    document.getElementById('Oceania').onclick = function() { //Oceania
+        if (this.checked) {
+            document.cookie = "Oceania=on";
+            d3.select("svg").remove();
+            diagram();
+        } else {
+            deleteCookie("Oceania");
+            d3.select("svg").remove();
+            diagram();
+        }
+        };
+
+    function getCookie(name) {
+        var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    function deleteCookie(name) {
+        setCookie(name, "", {
+            expires: -1
+        })
+    }
+
+    function setCookie(name, value, options) {
+        options = options || {};
+
+        var expires = options.expires;
+
+        if (typeof expires == "number" && expires) {
+            var d = new Date();
+            d.setTime(d.getTime() + expires * 1000);
+            expires = options.expires = d;
+        }
+        if (expires && expires.toUTCString) {
+            options.expires = expires.toUTCString();
+        }
+
+        value = encodeURIComponent(value);
+
+        var updatedCookie = name + "=" + value;
+
+        for (var propName in options) {
+            updatedCookie += "; " + propName;
+            var propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += "=" + propValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+        }
+
+    function change_radio(what_do){
+      if (what_do !=  "none") {
+        document.cookie = "aggregation=on";
+        d3.select("svg").remove();
+        diagram();
+      }
+      else{
+        deleteCookie("aggregation");
+        d3.select("svg").remove();
+        diagram();
+      }
+    }
+
+    function change_sort(what_do){
+        document.cookie = "sort="+what_do;
+        d3.select("svg").remove();
+        diagram();
+    }
+
+    function sortir_name(obj) {
+        obj.sort(function(a, b) {
+            var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+        });
+    }
+
+    var margin = {top: 30, right: 120, bottom: 0, left: 120},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+    var width = 1450 - margin.left - margin.right;
+    var height = 900 - margin.top - margin.bottom;
+    var barHeight = 10;
+    var x = d3.scale.linear()
+    .range([0, width]);
+
+    var duration = 750,
+    delay = 25;
+
+    var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top");
+
+    var color = d3.scale.ordinal()
+    .range(["steelblue", "#ccc"]);
+
+    if (getCookie("year_diagram") == undefined) {
+      var year = 0;
+    }
+    else{
+        document.getElementById('sliderdate').value = getCookie("year_diagram");
+        var year = (1995 - Number(getCookie("year_diagram"))) * (-1);
+    }
+
+    /*DIAGRAMM*/
+      function diagram() {
+            if (getCookie("Americas") != undefined) {
+              document.getElementById('Americas').checked = true;;
+            }
+            if (getCookie("Africa") != undefined) {
+                document.getElementById('Africa').checked = true;
+            }
+             if (getCookie("Asia") != undefined) {
+                document.getElementById('Asia').checked = true;;
+            }
+            if (getCookie("Europe") != undefined) {
+                document.getElementById('Europe').checked = true;
+            }
+             if (getCookie("Oceania") != undefined) {
+                document.getElementById('Oceania').checked = true;;
+            }
+
+            if (getCookie("year_diagram") == undefined) {
+              var year = 0;
+            }
+            else{
+                document.getElementById('sliderdate').value = getCookie("year_diagram");
+                var year = (1995 - Number(getCookie("year_diagram"))) * (-1);
+            }
+            
+
+            if (getCookie("aggregation") != undefined) {
+                document.getElementById('continent').checked = true;;
+            }
+            else{
+                document.getElementById('agr_country').checked = true;
+            }
+            if (getCookie("sort") != undefined) {
+                if (getCookie("sort") == "sort_pop") {
+                    document.getElementById('sort_pop').checked = true;
+                }
+                else{
+                    if (getCookie("sort") == "sort_gdp") {
+                        document.getElementById('sort_gdp').checked = true
+                    }
+                    else{
+                        document.getElementById('sort_name').checked = true;
+                    }
+                }
+            }
+            else{
+                document.getElementById('sort_name').checked = true;
+            }
+
+            var margin = {top: 30, right: 120, bottom: 0, left: 120},
+                width = 960 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+            var width = 1450 - margin.left - margin.right;
+            var height = 1470 - margin.top - margin.bottom;
+            var barHeight = 5;
+            var x = d3.scale.linear()
+            .range([0, width]);
+
+            var duration = 750,
+            delay = 25;
+
+            var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("top");
+
+            var color = d3.scale.ordinal()
+            .range(["steelblue", "#ccc"]);
+
+             var svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            
+         
+            var xScale = d3.scale.linear().range([0, width]);
+            var yScale = d3.scale.ordinal().rangeRoundBands([0, height], .8, 0);
+         
+            var g = svg.append("g")
+                        .attr("transform", "translate("+margin.left+","+margin.top+")").attr("id", "main");
+
+            if(getCookie("encode") != undefined){//encode Population or GDP
+                var encode = getCookie("encode");
+                document.getElementById(encode).checked = true;
+            }
+            else{
+                var encode = "population";
+                document.getElementById(encode).checked = true;
+            }
+            d3.json("countries_1995_2012.json", function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    if ((getCookie("Oceania") != undefined) && (data[i]["continent"] == "Oceania")
+                        ||((getCookie("Americas") != undefined) && (data[i]["continent"] == "Americas"))
+                        ||((getCookie("Africa") != undefined) && (data[i]["continent"] == "Africa"))
+                        ||((getCookie("Asia") != undefined) && (data[i]["continent"] == "Asia"))
+                        ||((getCookie("Europe") != undefined) && (data[i]["continent"] == "Europe"))) {
+                    }
+                    else{
+                        if ((getCookie("Americas") == undefined)&&(getCookie("Africa") == undefined)&&(getCookie("Asia") == undefined)&&(getCookie("Europe") == undefined)&&(getCookie("Oceania") == undefined)) {
+
+                        }
+                        else{
+                            for (var j = i; j < data.length-1; j++) {
+                                data[j] = data[j+1];
+                            }
+                            data.length = data.length -1;
+                            i--;
+                            yScale = d3.scale.ordinal().rangeRoundBands([0, data.length*10], .8, 0);
+                        }
+                        
+                    }
+                };
+
+                if (getCookie("aggregation") != undefined) {
+                    document.getElementById('continent').checked = true;
+                    var data2 = {};
+                    var population = 0, i = 0;
+                    var res;
+                    var nested_rows = d3.nest()
+                    .key(function(d) { return d.continent})
+                    .rollup(function(leaves) {
+                      res = {};
+                      leaves.forEach(function(e){
+
+                        population +=  e["years"][year]["population"];
+                      }); 
+                      res.population = population;
+                      res.year = leaves[0]["years"][year]["year"];
+                      population = 0;
+                      return res;
+                    }) // Where aggregation happens
+                    .entries(data);
+
+                    var i;
+                    for (i = 0; i < nested_rows.length; i++) {                        
+                        data[i].continent = nested_rows[i].key;
+                        data[i].name = nested_rows[i].key;
+                        data[i].years[year].population = nested_rows[i].values.population;
+                    }
+                    data.length = i;
+                    yScale = d3.scale.ordinal().rangeRoundBands([0, data.length*10], .8, 0);
+
+                }
+                else{
+                    document.getElementById('agr_country').checked = true;
+                }
+
+                if (getCookie("sort") != undefined) {
+                    if (getCookie("sort") == "sort_pop") {
+                        data.sort(function(b, a) {
+                            return a.years[year].population - b.years[year].population;
+                        });
+                    }
+                    else{
+                        if (getCookie("sort") == "sort_gdp") {
+                            data.sort(function(a, b) {
+                                return a.years[year].gdp - b.years[year].gdp;
+                            });
+                        }
+                        else{
+                            sortir_name(data);           
+                        }
+                    }
+                }
+                else{
+                    sortir_name(data);
+                }
+
+                console.log(data);
+
+                down(data, 0, svg);
+                
+            });
+         }
+      diagram();
+
+
+      function down(d, i, svg) {
+           svg.append("rect")
+            .attr("class", "background")
+            .attr("width", width)
+            .attr("height", height);
+
+            svg.append("g")
+                .attr("class", "x axis");
+
+            svg.append("g")
+                .attr("class", "y axis")
+              .append("line")
+                .attr("y1", "100%");
+
+          // Mark any currently-displayed bars as exiting.
+          var exit = svg.selectAll(".enter")
+              .attr("class", "exit");
+
+          // Enter the new bars for the clicked-on data.
+          // Per above, entering bars are immediately visible.
+          var enter = bar(d,svg)
+              .attr("transform", stack(i))
+              .style("opacity", 1);
+
+
+          // Update the x-scale domain.
+          x.domain([0, d3.max(d, function(d) { return d["years"][year].population; })]).nice();
+
+          // Update the x-axis.
+          svg.selectAll(".x.axis").transition()
+              .duration(duration)
+              .call(xAxis);
+
+          // Transition entering bars to their new position.
+          var enterTransition = enter.transition()
+              .duration(duration)
+              .delay(function(d, i) { return i * delay; })
+              .attr("transform", function(d, i) { return "translate(0," + barHeight * i * 1.2 + ")"; });
+
+         
+          // Transition entering rects to the new x-scale.
+            enterTransition.select("rect")
+              .attr("width", function(d) { return x(d["years"][year].population); })
+              .style("fill", function(d) { return color(!!d); });
+
+
+                // Transition entering rects to the new x-scale.
+            enterTransition.select("rect")
+                  .attr("width", function(d) { return x(d["years"][year].population); })
+                  .style("fill", function(d) { return color(!!d); });
+
+            var exitTransition = exit.transition()
+                  .duration(duration)
+                  .style("opacity", 1e-6)
+                  .remove();
+
+            // Transition exiting bars to the new x-scale.
+            exitTransition.selectAll("rect")
+                  .attr("width", function(d) { return x(d.value); });
+
+            // Transition exiting bars to fade out.
+            d.index = i;
+        }
+
+    // Creates a set of bars for the given data node, at the specified index.
+        function bar(d, svg) {
+          var bar = svg.insert("g", ".y.axis")
+              .attr("class", "enter")
+              .attr("transform", "translate(0,5)")
+            .selectAll("g")
+              .data(d)
+            .enter().append("g");
+
+          bar.append("text")
+              .attr("x", -6)
+              .attr("y", barHeight / 2)
+              .attr("dy", ".30em")
+              .style("font-size", "11px")
+              .style("text-anchor", "end")
+              .text(function(d) { return d.name; });
+
+          bar.append("rect")
+              .attr("width", function(d) { return x(d["years"][year].population);})
+              .attr("height", barHeight);
+
+          return bar;
+        }
+
+        function stack(i) {
+          var x0 = 0;
+          return function(d) {
+            var tx = "translate(" + x0 + "," + 1 * i * 1.2 + ")";
+            x0 += x(50);
+            return tx;
+          };
+        }
+  </script>
+</body>
+</html>

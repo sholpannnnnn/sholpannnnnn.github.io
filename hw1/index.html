@@ -1,10 +1,63 @@
+<!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
 	<title>hw1</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+		*{
+			font-family: 'Open Sans', sans-serif;
+		}
+	</style>
+	<script src="https://d3js.org/d3.v3.min.js"></script>
 </head>
-<body>
+<body style="max-width: 960px; margin: 0 auto">
+	<h1 style="color: #1946ba;">First VIS101 Homework</h1>
+	<div style="border: 1px solid #F5F5F5; padding: 15px">
+		<div style="font-size: 18pt">Quote Of the Day:</div>
+		<p class="quote" style="border-left: 2px solid #A9A9A9; margin-left: 20px;margin-right: 20px; padding-left: 15px"></p>
+	</div>
+	<form method="GET" name="form1">
+		<input type="button" value="Quote of The Day" id="raz" style="background-color: #ec0b43; color: white; font-size: 13pt; margin-top: 20px" />
+	</form>
 
 <script type="text/javascript">
+<<<<<<< HEAD
+=======
+	var http = new XMLHttpRequest();
+	  http.open('GET', 'https://raw.githubusercontent.com/4skinSkywalker/Database-Quotes-JSON/master/quotes.json');  // составить асинхронный (по умолчанию true) GET запрос страницы
+	  http.onreadystatechange = function () {  // обратная связь: отдаёт ответ на запрос
+	    if (this.readyState == 4 && this.status == 200) {  // отследить момент, когда пришёл полный ответ
+	      var html = JSON.parse(this.responseText);  // this.responseText — ответ в виде текста
+	      var random = Math.floor(Math.random() * 5421);
+	      var span = html[random].quoteText;
+	      var autor = html[random].quoteAuthor;
+	      if (autor == "") {
+	      	autor = "Author does not exist";
+	      }
+	      document.getElementsByClassName("quote")[0].innerHTML = '"' + span + '" - ' + autor;
+	    }
+	  }
+	  http.send(null);  // отправить запрос
+
+  document.getElementById('raz').addEventListener('click', function(){
+	  var http = new XMLHttpRequest();
+	  http.open('GET', 'https://raw.githubusercontent.com/4skinSkywalker/Database-Quotes-JSON/master/quotes.json');  // составить асинхронный (по умолчанию true) GET запрос страницы
+	  http.onreadystatechange = function () {  // обратная связь: отдаёт ответ на запрос
+	    if (this.readyState == 4 && this.status == 200) {  // отследить момент, когда пришёл полный ответ
+	      var html = JSON.parse(this.responseText);  // this.responseText — ответ в виде текста
+	      var random = Math.floor(Math.random() * 5421);
+	      var span = html[random].quoteText;
+	      var autor = html[random].quoteAuthor;
+	      if (autor == "") {
+	      	autor = "Author does not exist";
+	      }
+	      document.getElementsByClassName("quote")[0].innerHTML = '"' + span + '" - ' + autor;
+	    }
+	  }
+	  http.send(null);  // отправить запрос
+  }, false)
+>>>>>>> a82519d5c5fbbd9b4a7bee6a2249ca9b3a44816f
 </script>
 </body>
 </html>

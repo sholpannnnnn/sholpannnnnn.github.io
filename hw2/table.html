@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<style type="text/css">
+	td, th {
+		border: 1px solid black; /* задаем сплошную границу размером 1 пиксель*/
+		padding: 10px; /* устанавливаем внутренние отступы для всех сторон */
+		text-align: center;
+	}
+  input{
+    margin-right: 15px;
+  }
+ rect {
+      fill:teal;
+      fill-opacity:.8;
+  }
+</style>
+  <body>
+    <p>Time update: 1995 
+      <input type="range" name="points" min="1995" max="2012" step="1" value="0" id="slidertime" oninput="change_year(this.value)"> 2012
+    </p>
+    <p>
+      Ftlter by: <label>Americas<input type="checkbox" name="Americas" value="Americas" title="Americas" id = "Americas"></input></label>
+      <label>Africa<input type="checkbox" name="Africa" value="Africa" title="Africa" id = "Africa"></input></label>
+      <label>Asia<input type="checkbox" name="Asia" value="Asia" title="Asia" id = "Asia"></input></label>
+      <label>Europe<input type="checkbox" name="Europe" value="Europe" title="Europe" id = "Europe"></input></label>
+      <label>Oceania<input type="checkbox" name="Oceania" value="Oceania" title="Oceania" id = "Oceania""></input></label>
+    </p>
+    <p>
+      Aggregation:
+      <label>None<input type="radio" name="details" id = "none" value="None" onclick="change_radio('none')"></label>
+      <label>by Continent<input type="radio" name="details" id = "Continent" value="Continent" onclick="change_radio('Continent')"></label>
+    </p>
+    <table rules="all" border="1" id = "tab">
+  		<tr>
+  			<th>name</th>
+  			<th>continent</th>
+  			<th>gdp</th>
+  			<th>life_expectancy</th>
+  			<th>population</th>
+  			<th>year</th>
+  		</tr>
+  	</table>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script>
+
+    function change_year(year){
+      document.cookie = "year="+year;
+      document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+
+    function change_radio(what_do){
+      if (what_do !=  "none") {
+        document.cookie = "Aggregation=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+      }
+      else{
+        deleteCookie("Aggregation");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+      }
+    }
+
+  document.getElementById('Americas').onclick = function() { //Americans input
+    if (this.checked) {
+        document.cookie = "Americas=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    } else {
+        deleteCookie("Americas");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+};
+
+document.getElementById('Africa').onclick = function() { //Africa
+    if (this.checked) {
+        document.cookie = "Africa=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    } else {
+        deleteCookie("Africa");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+};
+
+document.getElementById('Asia').onclick = function() { //Asia
+    if (this.checked) {
+        document.cookie = "Asia=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    } else {
+        deleteCookie("Asia");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+};
+
+document.getElementById('Europe').onclick = function() { //Europe
+    if (this.checked) {
+        document.cookie = "Europe=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    } else {
+        deleteCookie("Europe");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+};
+
+document.getElementById('Oceania').onclick = function() { //Oceania
+    if (this.checked) {
+        document.cookie = "Oceania=on";
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    } else {
+        deleteCookie("Oceania");
+        document.getElementById("tab").innerHTML = "<tr><th>name</th><th>continent</th><th>gdp</th><th>life_expectancy</th><th>population</th><th>year</th></tr>";
+        load();
+    }
+};
+
+function deleteCookie(name) {
+    setCookie(name, "", {
+        expires: -1
+    })
+}
+
+function delet(continent) {
+    var tr = document.querySelectorAll("tr.row");
+    var td = document.querySelectorAll("td");
+    var result, result2, result3;
+    for (var i = 0; i < tr.length; i++) {
+        result = tr[i].innerHTML;
+        result2 = result.split("<td>");
+        result3 = result2[2].split("</td>");
+        if (result3[0] != continent) {
+            tr[i].remove();
+        }
+    }
+}
+
+function zebra() {
+    var ro = document.querySelectorAll("tr.row");
+    for (var i = 0; i < ro.length; i++) {
+        if (i % 2 == 0) {
+            ro[i].style.backgroundColor = "#F5F5F5";
+        } else {
+            ro[i].style.backgroundColor = "white";
+        }
+    }
+}
+
+function setCookie(name, value, options) {
+    options = options || {};
+
+    var expires = options.expires;
+
+    if (typeof expires == "number" && expires) {
+        var d = new Date();
+        d.setTime(d.getTime() + expires * 1000);
+        expires = options.expires = d;
+    }
+    if (expires && expires.toUTCString) {
+        options.expires = expires.toUTCString();
+    }
+
+    value = encodeURIComponent(value);
+
+    var updatedCookie = name + "=" + value;
+
+    for (var propName in options) {
+        updatedCookie += "; " + propName;
+        var propValue = options[propName];
+        if (propValue !== true) {
+            updatedCookie += "=" + propValue;
+        }
+    }
+
+    document.cookie = updatedCookie;
+}
+
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+function sortir(obj) {
+    obj.sort(function(a, b) {
+        var continA = a.continent.toUpperCase(); // ignore upper and lowercase
+        var continB = b.continent.toUpperCase(); // ignore upper and lowercase
+        var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (continA < continB) {
+            return -1;
+        }
+        if (continA > continB) {
+            return 1;
+        }
+        // names must be equal
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+    });
+}
+
+function load() {
+    d3.json("countries_1995_2012.json", function(error, data) {
+            if (getCookie("Americas") != undefined) {
+              document.getElementById('Americas').checked = true;;
+            }
+            if (getCookie("Africa") != undefined) {
+                document.getElementById('Africa').checked = true;
+            }
+             if (getCookie("Asia") != undefined) {
+                document.getElementById('Asia').checked = true;;
+            }
+            if (getCookie("Europe") != undefined) {
+                document.getElementById('Europe').true = true;
+            }
+             if (getCookie("Oceania") != undefined) {
+                document.getElementById('Oceania').checked = true;;
+            }
+            if (getCookie("Aggregation") != undefined) {
+                document.getElementById('Continent').checked = true;;
+            }
+            else{
+                document.getElementById('none').checked = true;;
+            }
+            if (getCookie("year") != undefined) {
+                document.getElementById('slidertime').value = getCookie("year");
+            }
+
+
+            var columns = Object.keys(data[0]);
+            var table = d3.select("table");
+            tbody = table.append("tbody");
+            table.style("border", "1px solid black")
+            table.append("caption").html("World Countries Ranking").style("border", "1px solid black");
+            
+            if (getCookie("year") == undefined) {//find years
+              var year = 0;
+            }
+            else{
+              var year = (1995 - Number(getCookie("year"))) * (-1);
+            }
+            if (getCookie("Aggregation") != undefined) {
+                sortir(data);
+                var gdp = 0, life_expectancy = 0, population = 0;
+                var res = {};
+                var nested_rows = d3.nest()
+                .key(function(d) { return d.continent})
+                .rollup(function(leaves) {
+                  leaves.forEach(function(e){
+                    gdp += e["years"][year]["gdp"]; 
+                    life_expectancy += e["years"][year]["life_expectancy"];
+                    population +=  e["years"][year]["population"];
+                  }); 
+                  res.gdp = gdp;
+                  res.life_expectancy = life_expectancy;
+                  res.population = population;
+                  res.year = leaves[0]["years"][year]["year"];
+                  gdp = 0;   
+                  life_expectancy = 0;
+                  population = 0;
+                  return res;
+                }) // Where aggregation happens
+                .entries(data);
+                var i;
+                for (i = 0; i < nested_rows.length; i++) {                        
+                    data[i].continent = nested_rows[i].key;
+                    data[i].name = nested_rows[i].key;
+                    data[i].years[year].population = nested_rows[i].values.population;
+                    data[i].years[year].gpd = nested_rows[i].values.gdp;
+                    data[i].years[year].life_expectancy = nested_rows[i].values.life_expectancy;
+
+                }
+                data.length = i;
+            }
+              var rows = tbody.selectAll("tr.row").data(data).enter().append("tr").attr("class", "row");
+              sortir(rows);
+              
+             var cells = rows.selectAll("td").data(function(row) {
+                    if (((getCookie("Americas") != undefined) && (row["continent"] == "Americas"))
+                        ||((getCookie("Africa") != undefined) && (row["continent"] == "Africa"))
+                        ||((getCookie("Asia") != undefined) && (row["continent"] == "Asia"))
+                        ||((getCookie("Europe") != undefined) && (row["continent"] == "Europe"))
+                        ||((getCookie("Oceania") != undefined) && (row["continent"] == "Oceania"))) {
+                        return d3.range(Object.keys(row).length).map(function(column, i) {
+                            if (i == 0) {
+                                return row["name"];
+                            }
+                            if (i == 1) {
+                                return row["continent"];
+                            }
+                            if (i == 2) {
+                                return row["years"][year]["gdp"];
+                            }
+                            if (i == 3) {
+                                return row["years"][year]["life_expectancy"];
+                            }
+                            if (i == 4) {
+                                return row["years"][year]["population"];
+                            }
+                            if (i == 5) {
+                                return row["years"][year]["year"];
+                            }
+                        });
+                    }  else {
+                          if ((getCookie("Americas") == undefined)&&(getCookie("Africa") == undefined)&&(getCookie("Asia") == undefined)&&(getCookie("Europe") == undefined)&&(getCookie("Oceania") == undefined)) {
+                              return d3.range(Object.keys(row).length).map(function(column, i) {
+                                
+                                if (i == 0) {
+                                    return row["name"];
+                                }
+                                if (i == 1) {
+                                    return row["continent"];
+                                }
+                                if (i == 2) {
+                                    return row["years"][year]["gdp"];
+                                }
+                                if (i == 3) {
+                                    return row["years"][year]["life_expectancy"];
+                                }
+                                if (i == 4) {
+                                    return row["years"][year]["population"];
+                                }
+                                if (i == 5) {
+
+                                    return row["years"][year]["year"];
+                                }
+                            });
+                          }
+                          else{
+                            return 0;
+                          }
+                    }
+
+            }).enter().append("td").text(function(d) {
+            return d;
+        }).on("mouseover", function(d, i) {
+            d3.select(this.parentNode).style("background-color", "#F3ED86");
+        }).on("mouseout", function() {
+            zebra();
+            tbody.selectAll("tr").style("border", "1px solid black");
+        }); 
+      zebra();
+    });
+
+}
+load();
+    </script> 
+  </body>
+</html>
